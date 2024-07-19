@@ -20,7 +20,7 @@
 
 import { EventEmitter } from 'events';
 
-export default class Timer<Type = any> extends EventEmitter {
+export default class Timer extends EventEmitter {
     public paused = true;
     private _timer?: NodeJS.Timeout;
     private readonly _args: any[];
@@ -87,11 +87,7 @@ export default class Timer<Type = any> extends EventEmitter {
     public on(event: 'stop', listener: () => void): this;
 
     /** @ignore */
-    public on(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
-
-    /** @ignore */
-    public on (
-        event: any, listener: (...args: any[]) => void): this {
+    public on (event: any, listener: (...args: any[]) => void): this {
         return super.on(event, listener);
     }
 
@@ -119,9 +115,6 @@ export default class Timer<Type = any> extends EventEmitter {
      */
     public once(event: 'tick', listener: (...args: any[]) => void): this;
 
-    /** @ignore */
-    public once(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
-
     /**
      * Event that is emitted only once when we have an error
      *
@@ -131,8 +124,7 @@ export default class Timer<Type = any> extends EventEmitter {
     public once(event: 'error', listener: (error: Error) => void): this;
 
     /** @ignore */
-    public once (
-        event: any, listener: (...args: any[]) => void): this {
+    public once (event: any, listener: (...args: any[]) => void): this {
         return super.on(event, listener);
     }
 
@@ -160,9 +152,6 @@ export default class Timer<Type = any> extends EventEmitter {
      */
     public off(event: 'tick', listener: (...args: any[]) => void): this;
 
-    /** @ignore */
-    public off(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
-
     /**
      * Event that is emitted only once when we have an error
      *
@@ -172,8 +161,7 @@ export default class Timer<Type = any> extends EventEmitter {
     public off(event: 'error', listener: (error: Error) => void): this;
 
     /** @ignore */
-    public off (
-        event: any, listener: (...args: any[]) => void): this {
+    public off (event: any, listener: (...args: any[]) => void): this {
         return super.on(event, listener);
     }
 
@@ -260,11 +248,38 @@ export default class Timer<Type = any> extends EventEmitter {
     };
 }
 
+/** @ignore */
+abstract class ExtendedTimer<Type = any> extends Timer {
+    public on(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public on (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public on (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    public once(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public once (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public once (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    public off(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public off (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public off (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+}
+
 /**
  * A helper class that performs a sync function at the given interval
  * and emits the result on a regular basis
  */
-export class SyncTimer<Type = any> extends Timer<Type> {
+export class SyncTimer<Type = any> extends ExtendedTimer<Type> {
     public constructor (func: () => Type, interval: number, autostart = false) {
         super(interval);
 
@@ -292,7 +307,7 @@ export class SyncTimer<Type = any> extends Timer<Type> {
  * A helper class that performs an async function at the given interval
  * and emits the result on a regular basis
  */
-export class AsyncTimer<Type = any> extends Timer<Type> {
+export class AsyncTimer<Type = any> extends ExtendedTimer<Type> {
     public constructor (func: () => Promise<Type>, interval: number, autostart = false) {
         super(interval);
 
@@ -313,6 +328,14 @@ export class AsyncTimer<Type = any> extends Timer<Type> {
         this.on('error', () => {}); // swallow the error by default
 
         if (autostart) this.start();
+    }
+
+    /** @ignore */
+    public on (event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    public on (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public on (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
     }
 }
 
