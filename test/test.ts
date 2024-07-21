@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 import { describe, it } from 'mocha';
-import Timer from '../src/timer';
+import Timer from '../src';
 
 describe('Unit Tests', async () => {
     // const sleep = async (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
