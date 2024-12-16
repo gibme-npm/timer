@@ -1,6 +1,6 @@
 {
   "name": "@gibme/timer",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A simple timer/metronome",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
