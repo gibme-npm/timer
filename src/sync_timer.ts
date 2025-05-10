@@ -18,16 +18,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Timer from './timer';
-export { AsyncTimer } from './async_timer';
-export { SyncTimer } from './sync_timer';
-export { Timer };
+import { ExtendedTimer } from './extended_timer';
 
 /**
- * Sleeps for the given number of milliseconds
- * @param timeout
+ * A helper class that performs a sync function at the given interval
+ * and emits the result on a regular basis
  */
-export const sleep = async (timeout: number) =>
-    new Promise(resolve => setTimeout(resolve, timeout));
+export class SyncTimer<Type = any> extends ExtendedTimer<Type> {
+    public constructor (func: () => Type, interval: number, autostart = false) {
+        super(interval);
 
-export default Timer;
+        this.on('tick', () => {
+            try {
+                const now = Math.round((new Date()).getTime() / 1000);
+
+                // go get the results
+                const result = func();
+
+                // emit the results
+                this.emit('data', result, now, interval);
+            } catch (error: any) {
+                this.emit('error', error instanceof Error ? error : new Error(error.toString()));
+            }
+        });
+
+        this.on('error', () => {}); // swallow the error by default
+
+        if (autostart) this.start();
+    }
+}

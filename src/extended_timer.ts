@@ -19,15 +19,29 @@
 // SOFTWARE.
 
 import Timer from './timer';
-export { AsyncTimer } from './async_timer';
-export { SyncTimer } from './sync_timer';
-export { Timer };
 
-/**
- * Sleeps for the given number of milliseconds
- * @param timeout
- */
-export const sleep = async (timeout: number) =>
-    new Promise(resolve => setTimeout(resolve, timeout));
+export abstract class ExtendedTimer<Type = any> extends Timer {
+    public on(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public on (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public on (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
 
-export default Timer;
+    public once(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public once (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public once (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    public off(event: 'data', listener: (payload: Type, timestamp: number, interval: number) => void): this;
+    /** @ignore */
+    public off (event: any, listener: (...args: any[]) => void): this;
+    /** @ignore */
+    public off (event: any, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+}
